@@ -1,0 +1,809 @@
+version: 6.61.5
+
+type: DeclarativeSource
+
+check:
+  type: CheckStream
+  stream_names:
+    - Orders
+
+streams:
+  - type: DeclarativeStream
+    name: Orders
+    retriever:
+      type: SimpleRetriever
+      decoder:
+        type: JsonDecoder
+      paginator:
+        type: DefaultPaginator
+        page_size_option:
+          type: RequestOption
+          field_name: limit
+          inject_into: request_parameter
+        page_token_option:
+          type: RequestOption
+          field_name: offset
+          inject_into: request_parameter
+        pagination_strategy:
+          type: OffsetIncrement
+          page_size: 3500
+          inject_on_first_request: true
+      requester:
+        type: HttpRequester
+        url: >-
+          https://variant-sticky-io-api-1041741270489.europe-west1.run.app/api/orders
+        http_method: GET
+        error_handler:
+          type: DefaultErrorHandler
+          max_retries: 5
+          backoff_strategies:
+            - type: ConstantBackoffStrategy
+              backoff_time_in_seconds: 10
+        request_parameters:
+          end_date: 08/24/2025
+          start_date: 09/12/2024
+      record_selector:
+        type: RecordSelector
+        extractor:
+          type: DpathExtractor
+          field_path:
+            - data
+        transform_before_filtering: true
+    schema_loader:
+      type: InlineSchemaLoader
+      schema:
+        type: object
+        $schema: http://json-schema.org/schema#
+        properties:
+          c1:
+            type:
+              - string
+              - "null"
+          c2:
+            type:
+              - string
+              - "null"
+          c3:
+            type:
+              - string
+              - "null"
+          aid:
+            type:
+              - string
+              - "null"
+          opt:
+            type:
+              - string
+              - "null"
+          sid:
+            type:
+              - string
+              - "null"
+          afid:
+            type:
+              - string
+              - "null"
+          affid:
+            type:
+              - string
+              - "null"
+          is_rma:
+            type:
+              - string
+              - "null"
+          auth_id:
+            type:
+              - string
+              - "null"
+          cc_type:
+            type:
+              - string
+              - "null"
+          is_void:
+            type:
+              - string
+              - "null"
+          on_hold:
+            type:
+              - string
+              - "null"
+          prd_sku:
+            type:
+              - string
+              - "null"
+          child_id:
+            type:
+              - string
+              - "null"
+          click_id:
+            type:
+              - string
+              - "null"
+          is_fraud:
+            type:
+              - string
+              - "null"
+          order_id:
+            type:
+              - string
+              - "null"
+          prd_name:
+            type:
+              - string
+              - "null"
+          affiliate:
+            type:
+              - string
+              - "null"
+          cc_last_4:
+            type:
+              - string
+              - "null"
+          cc_number:
+            type:
+              - string
+              - "null"
+          coupon_id:
+            type:
+              - string
+              - "null"
+          hold_date:
+            type:
+              - string
+              - "null"
+          is_refund:
+            type:
+              - string
+              - "null"
+          last_name:
+            type:
+              - string
+              - "null"
+          parent_id:
+            type:
+              - string
+              - "null"
+          prd_price:
+            type:
+              - string
+              - "null"
+          shippable:
+            type:
+              - string
+              - "null"
+          void_date:
+            type:
+              - string
+              - "null"
+          cc_expires:
+            type:
+              - string
+              - "null"
+          cc_first_6:
+            type:
+              - string
+              - "null"
+          contact_id:
+            type:
+              - string
+              - "null"
+          first_name:
+            type:
+              - string
+              - "null"
+          gateway_id:
+            type:
+              - string
+              - "null"
+          ip_address:
+            type:
+              - string
+              - "null"
+          is_test_cc:
+            type:
+              - string
+              - "null"
+          on_hold_by:
+            type:
+              - string
+              - "null"
+          promo_code:
+            type:
+              - string
+              - "null"
+          retry_date:
+            type:
+              - string
+              - "null"
+          rma_number:
+            type:
+              - string
+              - "null"
+          rma_reason:
+            type:
+              - string
+              - "null"
+          time_stamp:
+            type:
+              - string
+              - "null"
+          ancestor_id:
+            type:
+              - string
+              - "null"
+          campaign_id:
+            type:
+              - string
+              - "null"
+          customer_id:
+            type:
+              - string
+              - "null"
+          is_cascaded:
+            type:
+              - string
+              - "null"
+          order_total:
+            type:
+              - string
+              - "null"
+          prd_on_hold:
+            type:
+              - string
+              - "null"
+          refund_date:
+            type:
+              - string
+              - "null"
+          shipping_id:
+            type:
+              - string
+              - "null"
+          systemNotes:
+            type:
+              - string
+              - "null"
+          void_amount:
+            type:
+              - string
+              - "null"
+          billing_city:
+            type:
+              - string
+              - "null"
+          is_recurring:
+            type:
+              - string
+              - "null"
+          order_status:
+            type:
+              - string
+              - "null"
+          prd_offer_id:
+            type:
+              - string
+              - "null"
+          processor_id:
+            type:
+              - string
+              - "null"
+          website_sent:
+            type:
+              - string
+              - "null"
+          billing_cycle:
+            type:
+              - string
+              - "null"
+          billing_state:
+            type:
+              - string
+              - "null"
+          breakdown_tax:
+            type:
+              - string
+              - "null"
+          email_address:
+            type:
+              - string
+              - "null"
+          employeeNotes:
+            type:
+              - array
+              - "null"
+            items:
+              type:
+                - string
+                - "null"
+          is_chargeback:
+            type:
+              - string
+              - "null"
+          prd_hold_date:
+            type:
+              - string
+              - "null"
+          prd_hold_type:
+            type:
+              - string
+              - "null"
+          prd_is_add_on:
+            type:
+              - string
+              - "null"
+          prepaid_match:
+            type:
+              - string
+              - "null"
+          refund_amount:
+            type:
+              - string
+              - "null"
+          response_code:
+            type:
+              - string
+              - "null"
+          retry_attempt:
+            type:
+              - string
+              - "null"
+          return_reason:
+            type:
+              - string
+              - "null"
+          shipping_city:
+            type:
+              - string
+              - "null"
+          shipping_date:
+            type:
+              - string
+              - "null"
+          sub_affiliate:
+            type:
+              - string
+              - "null"
+          cc_orig_last_4:
+            type:
+              - string
+              - "null"
+          credit_applied:
+            type:
+              - string
+              - "null"
+          decline_reason:
+            type:
+              - string
+              - "null"
+          is_blacklisted:
+            type:
+              - string
+              - "null"
+          prd_offer_name:
+            type:
+              - string
+              - "null"
+          prd_product_id:
+            type:
+              - string
+              - "null"
+          recurring_date:
+            type:
+              - string
+              - "null"
+          shipping_state:
+            type:
+              - string
+              - "null"
+          transaction_id:
+            type:
+              - string
+              - "null"
+          billing_country:
+            type:
+              - string
+              - "null"
+          breakdown_total:
+            type:
+              - string
+              - "null"
+          cc_orig_first_6:
+            type:
+              - string
+              - "null"
+          chargeback_date:
+            type:
+              - string
+              - "null"
+          is_3d_protected:
+            type:
+              - string
+              - "null"
+          main_product_id:
+            type:
+              - string
+              - "null"
+          order_confirmed:
+            type:
+              - string
+              - "null"
+          order_sales_tax:
+            type:
+              - string
+              - "null"
+          prd_is_in_trial:
+            type:
+              - string
+              - "null"
+          prd_is_terminal:
+            type:
+              - string
+              - "null"
+          prd_product_qty:
+            type:
+              - string
+              - "null"
+          prd_step_number:
+            type:
+              - string
+              - "null"
+          shipping_amount:
+            type:
+              - string
+              - "null"
+          tracking_number:
+            type:
+              - string
+              - "null"
+          acquisition_date:
+            type:
+              - string
+              - "null"
+          billing_postcode:
+            type:
+              - string
+              - "null"
+          billing_state_id:
+            type:
+              - string
+              - "null"
+          check_ssn_last_4:
+            type:
+              - string
+              - "null"
+          check_transitnum:
+            type:
+              - string
+              - "null"
+          consent_received:
+            type:
+              - string
+              - "null"
+          consent_required:
+            type:
+              - string
+              - "null"
+          prd_is_recurring:
+            type:
+              - string
+              - "null"
+          prd_is_shippable:
+            type:
+              - string
+              - "null"
+          preserve_gateway:
+            type:
+              - string
+              - "null"
+          shipping_country:
+            type:
+              - string
+              - "null"
+          website_received:
+            type:
+              - string
+              - "null"
+          billing_last_name:
+            type:
+              - string
+              - "null"
+          breakdown_tax_pct:
+            type:
+              - string
+              - "null"
+          breakdown_vat_tax:
+            type:
+              - string
+              - "null"
+          ip_Address_lookup:
+            type:
+              - string
+              - "null"
+          prd_refund_amount:
+            type:
+              - string
+              - "null"
+          shipping_postcode:
+            type:
+              - string
+              - "null"
+          shipping_state_id:
+            type:
+              - string
+              - "null"
+          upsell_product_id:
+            type:
+              - string
+              - "null"
+          billing_first_name:
+            type:
+              - string
+              - "null"
+          breakdown_refunded:
+            type:
+              - string
+              - "null"
+          breakdown_shipping:
+            type:
+              - string
+              - "null"
+          breakdown_subtotal:
+            type:
+              - string
+              - "null"
+          credit_card_number:
+            type:
+              - string
+              - "null"
+          gateway_descriptor:
+            type:
+              - string
+              - "null"
+          prd_is_full_refund:
+            type:
+              - string
+              - "null"
+          prd_recurring_date:
+            type:
+              - string
+              - "null"
+          shipping_last_name:
+            type:
+              - string
+              - "null"
+          customers_telephone:
+            type:
+              - string
+              - "null"
+          prd_subscription_id:
+            type:
+              - string
+              - "null"
+          shipping_first_name:
+            type:
+              - string
+              - "null"
+          billing_company_name:
+            type:
+              - string
+              - "null"
+          check_account_last_4:
+            type:
+              - string
+              - "null"
+          check_routing_last_4:
+            type:
+              - string
+              - "null"
+          created_by_user_name:
+            type:
+              - string
+              - "null"
+          order_confirmed_date:
+            type:
+              - string
+              - "null"
+          order_customer_types:
+            type:
+              - array
+              - "null"
+            items:
+              type:
+                - object
+                - "null"
+              properties:
+                type:
+                  type:
+                    - string
+                    - "null"
+                order_id:
+                  type:
+                    - string
+                    - "null"
+                customer_id:
+                  type:
+                    - string
+                    - "null"
+                prospect_id:
+                  type:
+                    - string
+                    - "null"
+          prd_billing_model_id:
+            type:
+              - string
+              - "null"
+          shipping_method_name:
+            type:
+              - string
+              - "null"
+          breakdown_vat_tax_pct:
+            type:
+              - string
+              - "null"
+          main_product_quantity:
+            type:
+              - string
+              - "null"
+          prd_subscription_desc:
+            type:
+              - string
+              - "null"
+          prd_subscription_type:
+            type:
+              - string
+              - "null"
+          shipping_company_name:
+            type:
+              - string
+              - "null"
+          billing_street_address:
+            type:
+              - string
+              - "null"
+          coupon_discount_amount:
+            type:
+              - string
+              - "null"
+          decline_reason_details:
+            type:
+              - string
+              - "null"
+          order_sales_tax_amount:
+            type:
+              - string
+              - "null"
+          prd_billing_model_name:
+            type:
+              - string
+              - "null"
+          prd_forecasted_revenue:
+            type:
+              - string
+              - "null"
+          stop_after_next_rebill:
+            type:
+              - string
+              - "null"
+          amount_refunded_to_date:
+            type:
+              - string
+              - "null"
+          billing_street_address2:
+            type:
+              - string
+              - "null"
+          rebill_discount_percent:
+            type:
+              - string
+              - "null"
+          shipping_street_address:
+            type:
+              - string
+              - "null"
+          upsell_product_quantity:
+            type:
+              - string
+              - "null"
+          breakdown_restocking_fee:
+            type:
+              - string
+              - "null"
+          created_by_employee_name:
+            type:
+              - string
+              - "null"
+          is_any_product_recurring:
+            type:
+              - string
+              - "null"
+          shipping_street_address2:
+            type:
+              - string
+              - "null"
+          breakdown_amount_refunded:
+            type:
+              - string
+              - "null"
+          breakdown_volume_discount:
+            type:
+              - string
+              - "null"
+          next_subscription_product:
+            type:
+              - string
+              - "null"
+          prd_next_subscription_qty:
+            type:
+              - string
+              - "null"
+          prd_billing_model_discount:
+            type:
+              - string
+              - "null"
+          next_subscription_product_id:
+            type:
+              - string
+              - "null"
+          prd_billing_model_description:
+            type:
+              - string
+              - "null"
+          prd_next_subscription_product:
+            type:
+              - string
+              - "null"
+          current_rebill_discount_percent:
+            type:
+              - string
+              - "null"
+          decline_salvage_discount_percent:
+            type:
+              - string
+              - "null"
+          prd_next_subscription_product_id:
+            type:
+              - string
+              - "null"
+          prd_next_subscription_product_price:
+            type:
+              - string
+              - "null"
+        additionalProperties: true
+    transformations: []
+
+spec:
+  type: Spec
+  connection_specification:
+    type: object
+    $schema: http://json-schema.org/draft-07/schema#
+    required: []
+    properties: {}
+    additionalProperties: true
+
+metadata:
+  testedStreams:
+    view:
+      isStale: false
+      hasRecords: false
+      streamHash: bc8bd57dc3a86dfd415343e4fd1a350becec82a5
+      hasResponse: true
+      primaryKeysAreUnique: true
+      primaryKeysArePresent: true
+      responsesAreSuccessful: false
+    Orders:
+      isStale: false
+      hasRecords: true
+      streamHash: 3531386505253c8103a460c2c264510ecde05b21
+      hasResponse: true
+      primaryKeysAreUnique: true
+      primaryKeysArePresent: true
+      responsesAreSuccessful: true
+    stream_0:
+      streamHash: ad11f9fa446b445a056b0f48d54e74059e0bc977
+  autoImportSchema:
+    view: true
+    Orders: false
+
+concurrency_level:
+  type: ConcurrencyLevel
+  default_concurrency: 1

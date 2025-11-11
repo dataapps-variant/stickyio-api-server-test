@@ -1,0 +1,25 @@
+# FastAPI and ASGI server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# HTTP client for API calls
+aiohttp==3.9.1
+
+# Caching
+cachetools==5.3.2
+
+# Environment variables (optional but recommended)
+python-dotenv==1.0.0
+
+# Logging (optional - Python has built-in logging)
+# But if you want structured logging:
+# structlog==23.2.0
+
+# For production deployment
+gunicorn==21.2.0
+
+# Type hints support (Python 3.8+)
+typing-extensions==4.8.0
+
+# JSON handling (usually built-in but explicit version)
+# ujson==5.8.0  # Optional: faster JSON parsing

@@ -899,6 +899,7 @@ async def get_orders(
         # ✅ STEP 5: Build response with complete metadata
         response_data = {
             "data": transformed_orders,
+            "cursor": cursor,
             "pagination": {
                 "offset": offset,
                 "limit": original_limit,
@@ -933,6 +934,7 @@ async def get_orders(
             timestamps = [order.get("time_stamp") for order in transformed_orders if order.get("time_stamp")]
             if timestamps:
                 response_data["incremental"]["cursor"] = max(timestamps)
+                response_data["cursor"] = max(timestamps)
         
         # ✅ STEP 6: Response size monitoring and auto-adjustment
         response_size = estimate_response_size(response_data)

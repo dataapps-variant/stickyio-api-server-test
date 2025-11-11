@@ -707,10 +707,10 @@ def convert_cursor_to_date_time(cursor: str) -> tuple[str, str, str, str]:
         
         # End date is today
         end_datetime = datetime.now()
-        end_date_str = end_datetime.strftime("%m/%d/%Y")
-        end_time = "23:59:59"
+        end_date = end_datetime.strftime("%m/%d/%Y")
+        end_time = end_datetime.strftime("%H:%M:%S")
         
-        return start_date, start_time, end_date_str, end_time
+        return start_date, start_time, end_date, end_time
         
     except ValueError:
         logger.warning(f"Invalid cursor format: {cursor}")

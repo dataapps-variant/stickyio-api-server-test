@@ -706,7 +706,7 @@ def convert_cursor_to_date_time(cursor: str) -> tuple[str, str, str, str]:
         start_time = cursor_datetime.strftime("%H:%M:%S")
         
         # End date is today
-        end_datetime = datetime.now()
+        end_datetime = datetime.now() - timedelta(minutes=5)
         end_date = end_datetime.strftime("%m/%d/%Y")
         end_time = end_datetime.strftime("%H:%M:%S")
         

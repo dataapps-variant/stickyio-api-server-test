@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from cachetools import TTLCache
 import logging
 import time
-
+from datetime import datetime, timezone
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -701,12 +701,12 @@ sticky_client = StickyAPIClient()
 def convert_cursor_to_date_time(cursor: str) -> tuple[str, str, str, str]:
     """Convert cursor timestamp to Sticky.io date/time format"""
     try:
-        cursor_datetime = datetime.strptime(cursor, "%Y-%m-%d %H:%M:%S")
+        cursor_datetime = datetime.strptime(cursor, "%Y-%m-%d %H:%M:%S") + timedelta(seconds=1)
         start_date = cursor_datetime.strftime("%m/%d/%Y")
         start_time = cursor_datetime.strftime("%H:%M:%S")
         
         # End date is today
-        end_datetime = datetime.now() - timedelta(minutes=5)
+        end_datetime = datetime.now(timezone.utc)- timedelta(minutes=10)
         end_date = end_datetime.strftime("%m/%d/%Y")
         end_time = end_datetime.strftime("%H:%M:%S")
         

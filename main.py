@@ -161,9 +161,9 @@ class StickyAPIClient:
                             transformed_orders.append(order_copy)
 
                         # Cache the results
-                        for order in transformed_orders:
-                            order_id = str(order.get("order_id"))
-                            order_cache[order_id] = order
+                        #for order in transformed_orders:
+                        #    order_id = str(order.get("order_id"))
+                        #    order_cache[order_id] = order
                         
                         logger.info(f"Batch {batch_num} completed successfully: {len(transformed_orders)} orders")
                         return transformed_orders
@@ -423,8 +423,8 @@ class StickyAPIClient:
                         # Handle single vs multiple order responses
                         if isinstance(transformed_orders, list):
                             for order in transformed_orders:
-                                order_id = str(order.get("order_id"))
-                                order_cache[order_id] = order
+                                #order_id = str(order.get("order_id"))
+                                #order_cache[order_id] = order
                                 all_orders.append(order)
                         else:
                             logger.error(f"Error in transformation")
@@ -706,7 +706,7 @@ def convert_cursor_to_date_time(cursor: str) -> tuple[str, str, str, str]:
         start_time = cursor_datetime.strftime("%H:%M:%S")
         
         # End date is today
-        end_datetime = datetime.now(timezone.utc)- timedelta(minutes=10)
+        end_datetime = datetime.now(timezone.utc)- timedelta(hours=1)
         end_date = end_datetime.strftime("%m/%d/%Y")
         end_time = end_datetime.strftime("%H:%M:%S")
         
@@ -933,8 +933,12 @@ async def get_orders(
         if transformed_orders and include_details:
             timestamps = [order.get("time_stamp") for order in transformed_orders if order.get("time_stamp")]
             if timestamps:
-                response_data["incremental"]["cursor"] = max(timestamps)
-                response_data["cursor"] = max(timestamps)
+                datetime_objects = [ datetime.strptime(ts, '%Y-%m-%d %H:%M:%S') for ts in timestamps ]
+                max_datetime = max(datetime_objects)
+                # Convert back to your format
+                cursor = max_datetime.strftime('%Y-%m-%d %H:%M:%S')
+                response_data["incremental"]["cursor"] = cursor
+                response_data["cursor"] = cursor
         
         # ✅ STEP 6: Response size monitoring and auto-adjustment
         response_size = estimate_response_size(response_data)
@@ -1119,8 +1123,12 @@ async def get_orders(
         if transformed_orders and include_details:
             timestamps = [order.get("time_stamp") for order in transformed_orders if order.get("time_stamp")]
             if timestamps:
-                response_data["incremental"]["cursor"] = max(timestamps)
-                response_data["cursor"] = max(timestamps)
+                datetime_objects = [ datetime.strptime(ts, '%Y-%m-%d %H:%M:%S') for ts in timestamps ]
+                max_datetime = max(datetime_objects)
+                # Convert back to your format
+                cursor = max_datetime.strftime('%Y-%m-%d %H:%M:%S')
+                response_data["incremental"]["cursor"] =cursor
+                response_data["cursor"] = cursor
         
         # ✅ STEP 6: Response size monitoring and auto-adjustment
         response_size = estimate_response_size(response_data)

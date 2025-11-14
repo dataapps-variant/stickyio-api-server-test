@@ -10,6 +10,7 @@ import time
 from datetime import datetime, timezone
 # Configure logging
 logging.basicConfig(level=logging.INFO)
+from zoneinfo import ZoneInfo
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Sticky.io to Airbyte Middleware", version="1.0.0")
@@ -706,7 +707,7 @@ def convert_cursor_to_date_time(cursor: str) -> tuple[str, str, str, str]:
         start_time = cursor_datetime.strftime("%H:%M:%S")
         
         # End date is today
-        end_datetime = datetime.now(timezone.utc)- timedelta(hours=1)
+        end_datetime = datetime.now(ZoneInfo("America/New_York")) - timedelta(hours=1)
         end_date = end_datetime.strftime("%m/%d/%Y")
         end_time = end_datetime.strftime("%H:%M:%S")
         

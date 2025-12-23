@@ -11,6 +11,9 @@ from datetime import datetime, timezone
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 from zoneinfo import ZoneInfo
+from google.cloud import bigquery
+from google.oauth2 import service_account
+
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Sticky.io to Airbyte Middleware", version="1.0.0")
@@ -747,7 +750,11 @@ def filter_orders_by_cursor(orders: List[Dict[str, Any]], cursor: str) -> List[D
                     filtered_orders.append(order)
             else:
                 filtered_orders.append(order)
-        
+        # Sort orders by timestamp
+        #filtered_orders.sort(
+        #    key=lambda x: datetime.strptime(x.get("time_stamp", ""), "%Y-%m-%d %H:%M:%S") 
+        #    if x.get("time_stamp") else datetime.max
+        #)
         return filtered_orders
     except ValueError:
         logger.warning(f"Invalid cursor format: {cursor}")
@@ -783,6 +790,41 @@ def estimate_response_size(data: any) -> int:
         # Fallback estimation
         import sys
         return sys.getsizeof(data)
+
+
+def GetMissingOrders(company):
+
+    SVC ="ewogICJ0eXBlIjogInNlcnZpY2VfYWNjb3VudCIsCiAgInByb2plY3RfaWQiOiAidmFyaWFudC1maW5hbmNlLWRhdGEtcHJvamVjdCIsCiAgInByaXZhdGVfa2V5X2lkIjogIjEwNjY5YjNmZGY0ZmU2MWJiNjJiMjE0MWFjY2M1YTA0NzI0NzhmNjgiLAogICJwcml2YXRlX2tleSI6ICItLS0tLUJFR0lOIFBSSVZBVEUgS0VZLS0tLS1cbk1JSUV2UUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktjd2dnU2pBZ0VBQW9JQkFRRHJ6TlRvK0dsNnZ2SldcbmdBZFlVczE0dmlVdUMzS0svc3cyd3NCWjVmTnlvK3JjTWY1NTlxM2JlWnR4R2toUllsUDRKYStxWXVqWVZoTDFcbmRMT09IbXVJb0JzN2ZKNWM0a2FXanVVRStYNWV4d3lvTjVycFNjYm82MUYyYmx4QzBrWllick51KytMYkUzcmZcbmk1QitKcGpkT052VkNHVnVLQk40eFFvaVc0WnJndXN1M2FlNmNkS0U4aS9SN0FDUitPb0dqTWg5dEI0WldFeXVcbmw0OGhEYkhKU0poOGRJaFhKRStteklLK1Q5d1Ntclc5dkNCZ2IyazhwNjdkdjFnWDFzMnJWQlZCR2xWUVdyUXRcbklxSzNySWJzRUxMMzF5OFhHazlpWldNM0oyMXI4aENsWDhBS0pHYkVkQ2pzUUJuNHhuai9Tei9RbXUvbXUvYnhcbm5CZEZiVjBGQWdNQkFBRUNnZ0VBRGdVNEhLRVdubnlIaXNLaWpTc2hPZjV1VmdKS3ZYNkFkSG9ZZDAvdnJYK1hcbkdhQWtYaXFmZEVjVENjTFREWG0vL2VkNXZqTVMzcmdoZVBSSEw5cFpzUDQ2R0V1azIrZDlaSHJiSGJSYkFmWXFcblo3OGtxQjNocEp4SFUvZ2tacm03Z29zVWdyTVo3a1pHZmsrOVYrN2lGSGRLeE93eW9iM2l5SUhJeERtMmNLSnpcbk1UTFBpZjZBVzBkV3NnZWhlS09pblg2THMvQXZYMUdPbVNtTVJ3RkNuVHF0K2Q4eE5JVm9JaGxmSER6RENPQWVcbmpNMitaazdXZHRiVmQ2QmxrSWliTjROYm1YU3hUSUFuemk0NTZJSG1VVVZtL09NdkR4OGhVR3Avc25YUUJtUXlcbmxvMFNOUEgyUHg1cXFoWU1rWmZ5R3pHcEdKcHpVcTdYaGxub1ZHQTVFUUtCZ1FEN2VtNGJYeUNUZDZWb3hXV2VcbjBhbEMyZlpUUUdwQU5rdmRBc0VxVWwxTS9iU3dycnBxa0pta3lnazRTdzZwSXN3WmxoOGVnVXRPY2JwbkJFSUVcbmNjSTJadHBNa2RtcUxkT1BzeG56TER1ZjVxa1MyMC9IcEpwVHduY0JxUnZpMmVXWEdablFGT0ZXK3UrZ0pqZ0ZcbnFoK1lDWUVTK3lXcFdVUVp5WitPaXhQZzhRS0JnUUR3Q2p2Mkk4VFpDblpRdlU2bncrSnpMeExYQjFPcStQSkRcbkRLV2lrd2pwTkt2ei9KOXNIc09FV1FyaXJUVHR5RzNEVEUwd3BNVnJUc0k2MC9hdjZCZnN4M09tZ0k1OEhlcHdcbkhxWW5GRWdSVFRJaHp3ZU1GZDkxb3BxcEtudUZUU3NqdjFWN2FhVzVZQ0dIVDhnVTJ6VC9tUmVIZmpvOGdrR2FcbkdkbVNjdDU5VlFLQmdRRHVoU0VLTlIvZ3Z3clVaT1lOelM2TmljNXBDQisrNThEc3owQUh0RGRxWHZpUzNDZFVcbkMvS3VxakkwZ254VlQvdm1DTTFiVWFicnNGTHNnczFiQ2NyN2JuSi9UWmIySXFFWEd2angvSEpSSjZZVmpJNE9cbi9jQ2kwVCt2QTRhL2s0eC8xSGhmTkc3RzRSdUcrcmtJSm1QeEFKSzhQaGxxbHBCUkpUdUJKOGlqQVFLQmdGanhcbnNkNDJ5czRSamwzRWg4eXFUTktaY3NXeXRWSDVCT3ZMVitTeHp1OTYwT3lMZ3hjeEh3bC9aUVV4WVJkcTJTRXdcbnVMbDVsSjE2aFlYKzNMMjVwb1BhTkFSU1JubS9MQXQzaitHVEpsRWk1WnlaZGhaMlZHTG1hYUNkV1QrL3BHaU9cbmtVSTFsMjdsTEFkVGpMUU50Y213RklQa1JmZjkzQWtaNHdEZEI0d3hBb0dBTlJ2QUZXMnpuTkdqTXBMZTFadVZcbmxTUjJzZk0yQTVlbzdLUTNjNTFOV2lMOENzK0FvcU1BeVVzVnBvZndDWGFJMlJxajVFVVFZRlV5SUl1RUJMb0Fcbmx6TlRET2RsdVhPTUNOUDV1Mk9LZmRhMWxBVmd6TFFqN1JNNWlyVjZ5TXBBL2tDKytRRGkyUVZRaFRUeDArWnRcbk45WDhQN3diY29QVWNPNXUrakM1R1RZPVxuLS0tLS1FTkQgUFJJVkFURSBLRVktLS0tLVxuIiwKICAiY2xpZW50X2VtYWlsIjogInN0aWNreS1tYWludGFpbmVyQHZhcmlhbnQtZmluYW5jZS1kYXRhLXByb2plY3QuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLAogICJjbGllbnRfaWQiOiAiMTEwNTQxMzU4MjIzODQ3NjM5MjMyIiwKICAiYXV0aF91cmkiOiAiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUuY29tL28vb2F1dGgyL2F1dGgiLAogICJ0b2tlbl91cmkiOiAiaHR0cHM6Ly9vYXV0aDIuZ29vZ2xlYXBpcy5jb20vdG9rZW4iLAogICJhdXRoX3Byb3ZpZGVyX3g1MDlfY2VydF91cmwiOiAiaHR0cHM6Ly93d3cuZ29vZ2xlYXBpcy5jb20vb2F1dGgyL3YxL2NlcnRzIiwKICAiY2xpZW50X3g1MDlfY2VydF91cmwiOiAiaHR0cHM6Ly93d3cuZ29vZ2xlYXBpcy5jb20vcm9ib3QvdjEvbWV0YWRhdGEveDUwOS9zdGlja3ktbWFpbnRhaW5lciU0MHZhcmlhbnQtZmluYW5jZS1kYXRhLXByb2plY3QuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLAogICJ1bml2ZXJzZV9kb21haW4iOiAiZ29vZ2xlYXBpcy5jb20iCn0K"
+    service_account_info = json.loads(base64.b64decode(SVC).decode('utf-8'))
+    bq_credentials = service_account.Credentials.from_service_account_info(service_account_info)
+    bq_client = bigquery.Client(project="variant-finance-data-project", credentials=bq_credentials)
+    existing_query = f"""
+           SELECT DISTINCT order_id 
+           FROM `variant-finance-data-project.Sticky_Data.missing_orders` 
+           WHERE company = '{company}' AND order_id IS NOT NULL
+       """
+    existing_df = bq_client.query(existing_query).to_dataframe()
+    existing_order_ids = set(existing_df['order_id'].astype(str).tolist())
+
+    # Delete existing records from the table
+    if existing_order_ids:
+        # Convert set to comma-separated string for SQL IN clause
+        order_ids_str = ", ".join([f"'{oid}'" for oid in existing_order_ids])
+
+        delete_query = f"""
+            DELETE FROM `variant-finance-data-project.Sticky_Data.missing_orders`
+            WHERE company = '{company}' AND order_id IN ({order_ids_str})
+        """
+
+        # Execute delete query
+        delete_job = bq_client.query(delete_query)
+        delete_job.result()  # Wait for completion
+
+        print(f"{company}: Deleted {len(existing_order_ids)} existing records from missing_orders table")
+
+        return existing_order_ids
+    else:
+        return None
 
 # API Routes
 
@@ -875,6 +917,13 @@ async def get_orders(
                 }
             }
         
+        # Add missing orders...
+        missing_orders = GetMissingOrders(company)
+        if missing_orders:
+            logger.info(f"🔧 Missing order find : {len(missing_orders)}")
+            order_ids.extend(list(missing_orders))
+        else:
+            logger.info(f"✅ No missing orders found in BigQuery for {company}")
         # ✅ STEP 2: Apply pagination to ORDER IDs FIRST (prevents 32MB responses)
         original_limit = limit
         paginated_order_ids = order_ids[offset:offset + limit]

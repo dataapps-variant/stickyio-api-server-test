@@ -23,3 +23,8 @@ typing-extensions==4.8.0
 
 # JSON handling (usually built-in but explicit version)
 # ujson==5.8.0  # Optional: faster JSON parsing
+google-cloud-bigquery-storage
+db-dtypes
+google-cloud-bigquery
+google-oauth
+pyarrow

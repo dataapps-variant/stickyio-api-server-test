@@ -729,7 +729,7 @@ def convert_cursor_to_date_time(cursor: str) -> tuple[str, str, str, str]:
             "23:59:59"
         )
 
-def filter_orders_by_cursor(orders: List[Dict[str, Any]], cursor: str) -> List[Dict[str, Any]]:
+def filter_orders_by_cursor(orders: List[Dict[str, Any]], cursor: str, missing_order: List[str]=[]) -> List[Dict[str, Any]]:
     """Filter orders to only include those after the cursor timestamp"""
     if not cursor or not orders:
         return orders
@@ -740,7 +740,7 @@ def filter_orders_by_cursor(orders: List[Dict[str, Any]], cursor: str) -> List[D
         
         for order in orders:
             order_timestamp = order.get("time_stamp")
-            if order_timestamp:
+            if order_timestamp and order.get("order_id") not in missing_order:
                 try:
                     order_datetime = datetime.strptime(order_timestamp, "%Y-%m-%d %H:%M:%S")
                     if order_datetime > cursor_datetime:
@@ -943,7 +943,7 @@ async def get_orders(
         # Step 4: Filter by cursor for incremental sync
         if cursor and sync_mode == "incremental":
             logger.info(f"Filtering {len(transformed_orders)} orders by cursor")
-            transformed_orders = filter_orders_by_cursor(transformed_orders, cursor)
+            transformed_orders = filter_orders_by_cursor(transformed_orders, cursor,missing_orders)
             logger.info(f"After cursor filtering: {len(transformed_orders)} orders")
         
         # ✅ STEP 5: Build response with complete metadata

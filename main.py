@@ -923,6 +923,7 @@ async def get_orders(
             logger.info(f"🔧 Missing order find : {len(missing_orders)}")
             order_ids.extend(list(missing_orders))
         else:
+            missing_orders =[]
             logger.info(f"✅ No missing orders found in BigQuery for {company}")
         # ✅ STEP 2: Apply pagination to ORDER IDs FIRST (prevents 32MB responses)
         original_limit = limit

@@ -24,7 +24,7 @@ STICKY_AUTH = []  # Basic Auth
 RATE_LIMIT_PER_MINUTE = 15
 REQUEST_TIMEOUT = 36000
 
-# Cache for order details to avoid repeated API calls
+# Cache for order details to avoid repeated API calls TR
 order_cache = TTLCache(maxsize=1000000, ttl=7200)  # 1 hour cache
 
 

@@ -27,4 +27,5 @@ google-cloud-bigquery-storage
 db-dtypes
 google-cloud-bigquery
 google-oauth
-pyarrowgoogle-cloud-secret-manager
+pyarrow
+google-cloud-secret-manager
